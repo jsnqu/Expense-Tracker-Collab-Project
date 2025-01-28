@@ -1,2 +1,7 @@
 # Expense-Tracker-Collab-Project
-Alex Lu, Kevin Poon, Jason Qu.
+Responsibilities & Credits:
+  Alex Lu
+    
+  Kevin Poon
+
+  Jason Qu
