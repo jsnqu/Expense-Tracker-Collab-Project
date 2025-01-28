@@ -1,4 +1,7 @@
+import time
+
 MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december')
+
 
 class ExpensesApp:
     def __init__(self):
@@ -31,12 +34,20 @@ class ExpensesApp:
 
     @staticmethod
     def input_date():
-        print()
+        today = time.strftime("%Y %m %d").split()
+        print("Leave blank for current date")
+
+        # Year
         while True:
             year = input("Year: ")
             if year.isdigit():
                 year = str(int(year))
                 break
+            elif len(year) == 0:
+                year = str(int(today[0]))
+                break
+
+        # Month
         while True:
             month = input("Month: ")
             if (month.isdigit() and 1<=int(month)<=12):
@@ -46,6 +57,11 @@ class ExpensesApp:
             elif month.lower() in MONTH_NAMES:
                 month = str(MONTH_NAMES.index(month.lower())+1)
                 break
+            elif len(month) == 0:
+                month = str(int(today[1]))
+                break
+
+        # Day
         while True:
             day = input("Day: ")
             if day.isdigit():
@@ -63,6 +79,9 @@ class ExpensesApp:
                     # strips leading zero if inputted
                     day = str(int(day))
                     break
+            elif len(day) == 0:
+                day = str(int(today[2]))
+                break
         return [year, month, day]
         
     def remove_expense(self):
