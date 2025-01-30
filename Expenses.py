@@ -4,29 +4,36 @@ MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', '
 
 class ExpensesApp:
     def __init__(self):
-        self.expenses_list = []
-        
+        self.expenses_list = []     
     def run(self):
-        print("Welcome to expense tracker!\nWhat would you like to do?\n1. Add Expense\n2. Remove Expense\n3. View Expenses")
+        print("Welcome to expense tracker!")
         while True:
-            action = input("")
-            if action.isdigit() and int(action) in range (1,4):
-                break
-            else:
-                print("Invalid Option")
-                
-        match int(action):
-            case 1:
-                self.add_expense()
-            case 2:
-                self.remove_expense()
-            case 3:
-                self.view_expenses()
-        self.expenses_list
-        print(self.expenses_list)
-        
+            print("What would you like to do?\n1. Add Expense\n2. Remove Expense\n3. View Expenses\n4. Exit")
+            while True:
+                action = input("")
+                if action.isdigit() and int(action) in range (1,5):
+                    break
+                else:
+                    print("Invalid Option")
+                    
+            match int(action):
+                case 1:
+                    self.add_expense()
+                case 2:
+                    self.remove_expense()
+                case 3:
+                    self.view_expenses()
+                case 4:
+                    exit()
+            self.expenses_list        
     def view_expenses(self):
-        print("Worked1")
+        if len(self.expenses_list) == 0: #user has no expenses
+            print("You currently have no expenses.")
+        else:
+            reminder_number = 1
+            for expenses in self.expenses_list:
+                print(f"{reminder_number}. {expenses}")
+                reminder_number+=1
     def add_expense(self):
         self.expenses_list
         name = input("What is your expense? ").title().strip()
@@ -42,7 +49,6 @@ class ExpensesApp:
             "amt": amount,
             "date": self.input_date()
         }
-        print(f"{expense['name']}, {expense['amt']}")
         self.expenses_list.append(expense)
 
     @staticmethod
@@ -95,11 +101,20 @@ class ExpensesApp:
             elif len(day) == 0:
                 day = str(int(today[2]))
                 break
-        return [year, month, day]
-        
+        return [year, month, day]      
     def remove_expense(self):
-        print("Worked2")
-        
+        self.view_expenses()
+        print("Which one would you like to remove?")
+        while True:
+            choice = input("")
+            if choice.isdigit() and int(choice) in range (len(self.expenses_list)+1):
+                choice = int(choice)
+                self.expenses_list.pop(choice-1)
+                print("Your remaining expenses are:")
+                self.view_expenses()
+                break
+            else:
+                print("Invalid Option")
     def filter_expenses(self):
         pass
     def calculate_expenses(self):
