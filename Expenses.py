@@ -2,18 +2,31 @@ import time
 
 MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december')
 
-
 class ExpensesApp:
     def __init__(self):
         self.expenses_list = []
         
     def run(self):
+        print("Welcome to expense tracker!\nWhat would you like to do?\n1. Add Expense\n2. Remove Expense\n3. View Expenses")
+        while True:
+            action = input("")
+            if action.isdigit() and int(action) in range (1,4):
+                break
+            else:
+                print("Invalid Option")
+                
+        match int(action):
+            case 1:
+                self.add_expense()
+            case 2:
+                self.remove_expense()
+            case 3:
+                self.view_expenses()
         self.expenses_list
-        self.add_expense()
         print(self.expenses_list)
         
     def view_expenses(self):
-        pass
+        print("Worked1")
     def add_expense(self):
         self.expenses_list
         name = input("What is your expense? ").title().strip()
@@ -85,13 +98,12 @@ class ExpensesApp:
         return [year, month, day]
         
     def remove_expense(self):
-        pass
+        print("Worked2")
         
     def filter_expenses(self):
         pass
     def calculate_expenses(self):
         pass
-        
 if __name__ =="__main__":
     app = ExpensesApp()
     app.run()
