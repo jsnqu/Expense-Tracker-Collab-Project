@@ -1,8 +1,9 @@
 from enum import Enum, auto
 
 AVAILABLE_COLOURS = ("BLACK","RED","GREEN","YELLOW","BLUE","MAGENTA","CYAN","WHITE")
-FOREGROUND_COLOURS = {AVAILABLE_COLOURS[i]:f"\033[3{i}m" for i in range(len(AVAILABLE_COLOURS))}
-BACKGROUND_COLOURS = {AVAILABLE_COLOURS[i]:f"\033[4{i}m" for i in range(len(AVAILABLE_COLOURS))}
+FOREGROUND = {AVAILABLE_COLOURS[i]:f"\033[3{i}m" for i in range(len(AVAILABLE_COLOURS))}
+BACKGROUND = {AVAILABLE_COLOURS[i]:f"\033[4{i}m" for i in range(len(AVAILABLE_COLOURS))}
+RESET = "\033[0m"
 
 
 def contrastRGB(colour_rgb:tuple):
@@ -45,6 +46,8 @@ def getCodeRGB(colour_rgb, option):
 
 
 def getCodeBasic(colour_4Bit, option, bright=False):
+    if isinstance(colour_4Bit, str):
+        colour_4Bit = AVAILABLE_COLOURS.index(colour_4Bit)
     brightness = 9 if bright else 3
     match option:
         case COLOUR_OPTION.FOREGROUND:
@@ -82,5 +85,5 @@ if __name__ == "__main__":
     import random
     for _ in range(1):
         #print(getCodeRGB(tuple(random.randint(0,255) for _ in range(3)), COLOUR_OPTION.AUTO_BACK)+"Hello World\033[0m")
-        print(getCode4Bit(random.randint(0,7), COLOUR_OPTION.AUTO_FRONT)+"Hello World\033[0m")
+        print(getCodeBasic(random.randint(0,7), COLOUR_OPTION.AUTO_FRONT)+"Hello World\033[0m")
         print(getCode8Bit(random.randint(0,255), COLOUR_OPTION.AUTO_FRONT)+"Hello World\033[0m")

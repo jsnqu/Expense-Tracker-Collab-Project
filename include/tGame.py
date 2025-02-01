@@ -187,31 +187,6 @@ def merge_ascii_colourmap(image, bitmap):
     return new_image
 
 
-def textInput(key_in: KeyboardInput, x_pos,y_pos):
-    x_pos = max(1, x_pos)
-    y_pos = max(1, y_pos)
-    text = []
-
-    while True:
-        setCursor(x_pos+len(text),y_pos)
-
-        key_in.keyIn()
-
-        match key_in.pressed:
-            case CONTROLS.ESCAPE:
-                return 0
-            case KEY.QUIT:
-                return KEY.QUIT
-            case KEY.BACKSPACE:
-                if len(text) > 0:
-                    text.pop()
-            case KEY.ENTER:
-                return "".join(text)
-            # text
-            case key_in.pressed if (KEY.SPACE <= key_in.pressed <= K_TILDE):
-                text.append(chr(key_in.pressed))
-
-
 class KeyboardInput:
     def __init__(self):
         self.pressed = 0
@@ -351,6 +326,38 @@ class KeyboardInput:
         # Should never get here
         raise Exception("somehow got past keyIn return statement")
 
+
+def textInput(key_in: KeyboardInput, x_pos,y_pos):
+    x_pos = max(1, x_pos)
+    y_pos = max(1, y_pos)
+    text = []
+
+    while True:
+        setCursor(x_pos+len(text),y_pos)
+
+        key_in.keyIn()
+
+        match key_in.pressed:
+            case CONTROLS.ESCAPE:
+                return CONTROLS.ESCAPE
+            case KEY.QUIT:
+                return KEY.QUIT
+
+            case KEY.BACKSPACE:
+                if len(text) > 0:
+                    moveCursor('D', 1)
+                    render(" ")
+                    moveCursor('D', 1)
+                    text.pop()
+            case KEY.ENTER:
+                return "".join(text)
+            # text
+            case key_in.pressed if (KEY.K_SPACE <= key_in.pressed <= KEY.K_TILDE):
+                render(chr(key_in.pressed))
+                text.append(chr(key_in.pressed))
+        renderCopy()
+
+
 if __name__ == "__main__":
     try:
         init()
@@ -372,8 +379,4 @@ if __name__ == "__main__":
         if POSIX:
             termios.tcsetattr(fd,termios.TCSADRAIN, old_settings)
     
-
-
-
-
 
