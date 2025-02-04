@@ -8,6 +8,8 @@ MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', '
 
 HINT_COLOUR = Colour.getCodeRGB((100, 20, 7), Colour.COLOUR_OPTION.FOREGROUND)
 INVALID_COLOUR = Colour.getCodeBasic("RED", Colour.COLOUR_OPTION.AUTO_BACK)
+MONEY_COLOUR = Colour.getCodeRGB((210,255,205), Colour.COLOUR_OPTION.AUTO_BACK)
+DATE_COLOUR = Colour.getCodeRGB((210,205,255), Colour.COLOUR_OPTION.AUTO_BACK)
 
 ORIGIN_POS = (2,2)
 
@@ -96,14 +98,26 @@ class ExpensesApp:
 
     def view_expenses(self):
         tGame.setCursor(ORIGIN_POS[0])
-        tGame.renderCopy()
         if len(self.expenses_list) == 0: #user has no expenses
-            print("You currently have no expenses.")
+            tGame.render("You currently have no expenses.")
         else:
             reminder_number = 1
             for expense in self.expenses_list:
-                print(f"{reminder_number}. {expense['name']}: {expense['amt']} ({expense['date']})")
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.render(f"""
+                \033[G{reminder_number}. {expense['name']}
+                \033[4G{MONEY_COLOUR}Amount:{Colour.RESET} ${expense['amt']}
+                \033[4G{DATE_COLOUR}Date:{Colour.RESET} {MONTH_NAMES[expense['date'][1]-1].title()} {expense['date'][2]}, {expense['date'][0]}
+                """)
                 reminder_number+=1
+
+        tGame.render('\n')
+        tGame.setCursor(ORIGIN_POS[0])
+        tGame.render(HINT_COLOUR+"(ANY KEY) to continue"+Colour.RESET)
+        tGame.renderCopy()
+        self.key_in.keyIn()
+        tGame.render("\033[2K")
+        tGame.renderCopy()
 
     def add_expense(self):
         tGame.screenClear()
@@ -132,7 +146,8 @@ class ExpensesApp:
             if amount == CONTROLS.ESCAPE or name == KEY.QUIT:
                 return
 
-            elif amount.isdigit():
+            amount = amount.strip(" $")
+            if amount.isdigit():
                 amount = int(amount)
                 break
             else:
@@ -166,10 +181,10 @@ class ExpensesApp:
         while True:
             year = input("  Year: ").strip()
             if year.isdigit():
-                year = str(int(year))
+                year = int(year)
                 break
             elif len(year) == 0:
-                year = str(int(today[0]))
+                year = int(today[0])
                 break
 
         # Month
@@ -189,25 +204,21 @@ class ExpensesApp:
         # Day
         while True:
             day = input("  Day: ").strip()
+            if len(day) == 0:
+                day = today[2]
             if day.isdigit():
-                if (month == '2' and int(day)==29):
-                    if (int(year) % 4 == 0):
-                        # strips leading zero if inputted
-                        day = str(int(day))
+                day = int(day)
+                if (month == '2' and day==29):
+                    if (year % 4 == 0):
                         break
                     else:
                         continue
     
-                elif (1<=int(day)<=30 and month in "4 6 9 11".split()) or (
-                      1<=int(day)<=31 and month in "1 3 5 7 8 10 12".split()) or (
-                      1<=int(day)<=28 and month == '2'):
-                    # strips leading zero if inputted
-                    day = str(int(day))
+                elif (1<=day<=30 and month in "4 6 9 11".split()) or (
+                      1<=day<=31 and month in "1 3 5 7 8 10 12".split()) or (
+                      1<=day<=28 and month == '2'):
                     break
-            elif len(day) == 0:
-                day = str(int(today[2]))
-                break
-        return [year, month, day]      
+        return [year, int(month), day]      
 
     def remove_expense(self):
         tGame.screenClear()
@@ -227,6 +238,7 @@ class ExpensesApp:
         while True:
             tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
             tGame.render("\033[2K")
+            tGame.renderCopy()
 
             choice = tGame.textInput(self.key_in,
                                      ORIGIN_POS[0], ORIGIN_POS[1]+1)
@@ -243,17 +255,21 @@ class ExpensesApp:
                     tGame.renderCopy()
                     if action:
                         match action[0]:
+                            # Back to Input
                             case 0: break
+                            # View
                             case 1:
                                 tGame.setCursor(ORIGIN_POS[0], 7)
                                 tGame.renderCopy()
                                 self.view_expenses()
+                            # Exit
                             case 2: return
 
             elif choice.strip().isdigit() and int(choice) in range (1,len(self.expenses_list)+1):
                 choice = int(choice)
                 self.expenses_list.pop(choice-1)
 
+                # Remaining expenses
                 tGame.screenClear()
                 tGame.setCursor(*ORIGIN_POS)
                 tGame.render("Your remaining expenses are:")
@@ -261,11 +277,8 @@ class ExpensesApp:
                 tGame.renderCopy()
                 self.view_expenses()
 
-                tGame.setCursor(ORIGIN_POS[0])
-                tGame.render(HINT_COLOUR+"(ANY KEY) to continue\n"+Colour.RESET)
-                tGame.renderCopy()
-                self.key_in.keyIn()
                 break
+
 
             else:
                 tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+2)
