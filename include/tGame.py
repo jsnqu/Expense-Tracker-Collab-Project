@@ -63,18 +63,23 @@ def moveCursor(direction: str, amount=1):
         raise Exception("Invalid Move Cursor Direction")
     render("\033["+str(amount)+direction)
 
-def setCursor(x: int=1, y: int=1, position: tuple=None):
+def setCursor(x: int=1, y: int=None, position: tuple=None):
     if position:
         try:
             x = position[0]
             y = position[1]
         except:
             raise ValueError(f"Invalid argument, position: found {type(position)} {position}, expected (x,y)")
+
     try:
-        if not (0 < x and 0 < y): raise ValueError()
+        if not (0 < x and (y == None or 0 < y)): raise ValueError()
+
     except (ValueError, TypeError):
-        raise Exception("Invalid x or y, x and y should be integers above 0: found x: {x}, y: {y}")
-    render(f"\033[{y};{x}H")
+        raise Exception("Invalid x or y, x and y should be integers above 0 (or y=None): found x: {x}, y: {y}")
+    if y==None:
+        render(f"\033[{x}G")
+    else:
+        render(f"\033[{y};{x}H")
 
 def hideCursor():
     render("\033[?25l")
@@ -371,7 +376,7 @@ if __name__ == "__main__":
                 break
             elif keyboard.pressed == CONTROLS.ESCAPE:
                  screenClear()
-            render("\033[;H")
+            setCursor(1,1)
  
             renderCopy()
 

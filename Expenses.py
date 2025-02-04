@@ -9,18 +9,20 @@ MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', '
 HINT_COLOUR = Colour.getCodeRGB((100, 20, 7), Colour.COLOUR_OPTION.FOREGROUND)
 INVALID_COLOUR = Colour.getCodeBasic("RED", Colour.COLOUR_OPTION.AUTO_BACK)
 
+ORIGIN_POS = (2,2)
+
 class ExpensesApp:
     def __init__(self):
         self.key_in = tGame.KeyboardInput()
 
         self.main_menu = Keypad(
                 ["Add Expense", "Remove Expense", "View Expense", "Exit"])
-        self.main_menu.format(x=2,y=7,
+        self.main_menu.format(x=ORIGIN_POS[0],y=ORIGIN_POS[1]+5,
                               layout=Keypad.LAYOUT.VERTICAL,
                               text_colour=(100,100,150))
         self.remove_menu = Keypad(
                 ["Back to Input", "View Expenses", "Exit"])
-        self.remove_menu.format(x=2,y=8,
+        self.remove_menu.format(x=ORIGIN_POS[0],y=ORIGIN_POS[1]+3,
                               layout=Keypad.LAYOUT.HORIZONTAL,
                               padding=2,
                               text_colour=(100, 20, 7))
@@ -34,52 +36,66 @@ class ExpensesApp:
         tGame.setTitle("Expense tracker") # Window title
 
         tGame.screenClear()
-        tGame.setCursor(2,2) # Starts topleft at (j,1)
+        tGame.setCursor(*ORIGIN_POS) # positions start topleft at (1,1)
         tGame.render("Welcome to expense tracker!\n"+"_"*29) # Appends to tGame.render_buffer (str)
 
         tGame.renderCopy() # sys.stdout.write(tGame.render_buffer)
         # tGame.render_buffer contains anything from tGame.render() (check tGame.py)
+        first_entry = True
 
         while True:
-            self.main_menu.index = 0 # Sets current choice to first option
+            tGame.hideCursor()
 
-            tGame.setCursor(2,5)
+            tGame.moveCursor('B', 2)
+            tGame.setCursor(2)
             tGame.render("What would you like to do?")
 
+            ExpensesApp.help_display(35,2)
+
+            self.main_menu.index = 0 # Sets current choice to first option
             self.main_menu.draw() # Draws before the blocking input call
+
             tGame.renderCopy()
 
             while True:
-                self.key_in.clearPipe() # Clears input prevents accidental choice (from holding button)
-                action = self.main_menu.update(self.key_in.keyNext()) # Redraws by default
-                tGame.renderCopy() # Required for Keypad draws including the one called by update(input_, draw=True)
+                # Clears input prevents accidental choice (from holding button)
+                self.key_in.clearPipe()
 
-                if not action: # CONTROLS.ACTION wasn't pressed, nothing submitted
+                # Redraws by default
+                action = self.main_menu.update(self.key_in.keyNext()) 
+
+                # Neither Keypad.draw nor Keypad.update call this automatically
+                tGame.renderCopy() 
+
+                # CONTROLS.ACTION wasn't pressed, nothing selected
+                if not action: 
                     continue
                 else:
+                    if first_entry: self.main_menu.format(y=ORIGIN_POS[1]+3)
                     break
                     
             # Keypad.update() returns tuple: (choice_index, choice_name)
-            # choice_index is recommended bc it's has to be unique
+            # choice_index is used bc it has to be unique, unlike choice_name
             match action[0]: 
                 case 0:
                     self.add_expense() # New scene
                 case 1:
-                    self.remove_menu.index = 0 # Refer line 44 (sets to first option)
+                    self.remove_menu.index = 0 # Sets to first option in menu
                     self.remove_expense() # New scene
                 case 2:
-                    tGame.setCursor(2,12)
+                    tGame.setCursor(ORIGIN_POS[0],12)
                     tGame.renderCopy()
 
                     self.view_expenses() # Not new scene (yet?) TODO
                     self.key_in.keyNext() # Waits for any input before screenClear() is called
                 case 3:
-                    return
+                    return # Quit app
             time.sleep(0.1)
             tGame.screenClear()
+            tGame.setCursor(1,1)
 
     def view_expenses(self):
-        tGame.moveCursor('D', 500)
+        tGame.setCursor(ORIGIN_POS[0])
         tGame.renderCopy()
         if len(self.expenses_list) == 0: #user has no expenses
             print("You currently have no expenses.")
@@ -91,38 +107,53 @@ class ExpensesApp:
 
     def add_expense(self):
         tGame.screenClear()
-        tGame.setCursor(2,5)
-        tGame.render("What is your expense?")
+        tGame.setCursor(*ORIGIN_POS)
+        tGame.showCursor()
+
+        tGame.render("What is your expense for?")
+
+        tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+1)
         tGame.renderCopy()
 
-        name = tGame.textInput(self.key_in, 2, 6)
+        name = tGame.textInput(self.key_in, ORIGIN_POS[0], ORIGIN_POS[1]+1)
+
         if name == CONTROLS.ESCAPE or name == KEY.QUIT:
             return
         name = name.title().strip()
         while True:
-            tGame.setCursor(2, 7)
-            tGame.render("How much is your expense? ")
-            tGame.setCursor(2, 8)
-            tGame.render("\033[2K")
+            tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
+            tGame.render("How much is your expense?")
+            tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+4)
             tGame.renderCopy()
 
-            amount = tGame.textInput(self.key_in, 2, 8)
+            amount = tGame.textInput(self.key_in,
+                                     ORIGIN_POS[0], ORIGIN_POS[1]+4)
+
             if amount == CONTROLS.ESCAPE or name == KEY.QUIT:
                 return
 
-            if amount.isdigit():
+            elif amount.isdigit():
                 amount = int(amount)
                 break
             else:
-                tGame.setCursor(2, 9)
+                tGame.moveCursor('B', 1)
                 tGame.render(INVALID_COLOUR+"Invalid Amount"+ Colour.RESET)
+
+                # Reset to original position
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.moveCursor('A', 1)
+                tGame.render("\033[2K")
+
                 tGame.renderCopy()
-        tGame.setCursor(1, 11)
+
+        tGame.setCursor(y=ORIGIN_POS[1]+6)
         tGame.renderCopy()
+        date = self.input_date()
+
         expense = {
             "name": name,
             "amt": amount,
-            "date": self.input_date()
+            "date": date
         }
         self.expenses_list.append(expense)
 
@@ -133,7 +164,7 @@ class ExpensesApp:
 
         # Year
         while True:
-            year = input("Year: ").strip()
+            year = input("  Year: ").strip()
             if year.isdigit():
                 year = str(int(year))
                 break
@@ -143,7 +174,7 @@ class ExpensesApp:
 
         # Month
         while True:
-            month = input("Month: ").strip()
+            month = input("  Month: ").strip()
             if (month.isdigit() and 1<=int(month)<=12):
                 # strips leading zero if inputted
                 month = str(int(month))
@@ -157,7 +188,7 @@ class ExpensesApp:
 
         # Day
         while True:
-            day = input("Day: ").strip()
+            day = input("  Day: ").strip()
             if day.isdigit():
                 if (month == '2' and int(day)==29):
                     if (int(year) % 4 == 0):
@@ -180,27 +211,31 @@ class ExpensesApp:
 
     def remove_expense(self):
         tGame.screenClear()
-        tGame.setCursor(2,5)
+        tGame.setCursor(*ORIGIN_POS)
+        tGame.showCursor()
 
         tGame.render(Colour.FOREGROUND["RED"]+"Which one would you like to remove?"+Colour.RESET)
 
-        tGame.setCursor(2,8)
+        tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
         tGame.render(HINT_COLOUR+"(ESCAPE) for options" + Colour.RESET)
 
-        tGame.setCursor(2,9)
+        tGame.setCursor(ORIGIN_POS[0], 7)
         tGame.renderCopy()
 
         self.view_expenses()
 
         while True:
-            tGame.setCursor(2,6)
+            tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
             tGame.render("\033[2K")
 
-            choice = tGame.textInput(self.key_in, 2, 6)
+            choice = tGame.textInput(self.key_in,
+                                     ORIGIN_POS[0], ORIGIN_POS[1]+1)
 
             if choice == CONTROLS.ESCAPE or choice == KEY.QUIT:
-                tGame.setCursor(1,8)
+                # Clears options message
+                tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+3)
                 tGame.render("\033[2K")
+
                 self.remove_menu.draw()
                 tGame.renderCopy()
                 while self.key_in.keyIn():
@@ -210,29 +245,30 @@ class ExpensesApp:
                         match action[0]:
                             case 0: break
                             case 1:
-                                tGame.setCursor(2,9)
+                                tGame.setCursor(ORIGIN_POS[0], 7)
                                 tGame.renderCopy()
                                 self.view_expenses()
                             case 2: return
 
-            elif choice.isdigit() and int(choice) in range (1,len(self.expenses_list)+1):
+            elif choice.strip().isdigit() and int(choice) in range (1,len(self.expenses_list)+1):
                 choice = int(choice)
                 self.expenses_list.pop(choice-1)
 
                 tGame.screenClear()
-                tGame.setCursor(2,2)
+                tGame.setCursor(*ORIGIN_POS)
                 tGame.render("Your remaining expenses are:")
-                tGame.setCursor(2,4)
+                tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+2)
                 tGame.renderCopy()
                 self.view_expenses()
 
-                tGame.render(HINT_COLOUR+"(ANY KEY) to continue\n\n"+Colour.RESET)
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.render(HINT_COLOUR+"(ANY KEY) to continue\n"+Colour.RESET)
                 tGame.renderCopy()
                 self.key_in.keyIn()
                 break
 
             else:
-                tGame.setCursor(2, 7)
+                tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+2)
                 tGame.render(INVALID_COLOUR+
                              "Invalid Option" + Colour.RESET)
                 tGame.renderCopy()
@@ -241,6 +277,16 @@ class ExpensesApp:
         pass
     def calculate_expenses(self):
         pass
+
+    @staticmethod
+    def help_display(x,y):
+        if x<=0 or y<=0:
+            raise ValueError(f"x and y must be integers above 0: found x:{x}, y:{y}")
+        tGame.setCursor(x=x,y=y)
+        tGame.renderCopy()
+        tGame.render(tGame.import_image("sprites.txt",10,do_colour=True).replace('\n','\033[1B\033['+str(x)+'G'))
+        tGame.renderCopy()
+
 if __name__ =="__main__":
     tGame.init()
     try:
@@ -248,3 +294,5 @@ if __name__ =="__main__":
         app.run()
     finally:
         tGame.end()
+
+

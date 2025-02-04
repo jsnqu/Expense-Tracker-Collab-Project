@@ -133,8 +133,10 @@ class Keypad:
     def update(self, input_, draw=True):
         # Inputs UP DOWN RIGHT LEFT ARROW KEYS
         # SPACE TO SELECT
+        submit = False
         match input_:
-            case CONTROLS.ACTION:
+            case input_ if input_ in CONTROLS.ACTION:
+                submit = True
                 displace = 0
             case CONTROLS.UP:
                 displace = -self.items_per_layer if (
@@ -161,7 +163,7 @@ class Keypad:
 
         # Pressed action key returns current option (str)
         # Directional input returns Non
-        return (self.index,self._options[self.index]) if input_==CONTROLS.ACTION else None
+        return (self.index,self._options[self.index]) if submit else None
 
     def _move_index(self, displacement):
         self.old_index = self.index
@@ -237,3 +239,21 @@ class OptionScreen:
         if not save_cursor_position:
             self.keypad.index = 0
     
+if __name__ == "__main__":
+    x = 0
+    tGame.init()
+    key = tGame.KeyboardInput()
+    main_menu = Keypad(
+            ["Add Expense", "Remove Expense", "View Expense", "Exit"])
+    main_menu.format(x=2,y=7,
+                          layout=Keypad.LAYOUT.VERTICAL,
+                          text_colour=(100,100,150))
+
+    while x < 100:
+        tGame.renderCopy()
+        key.keyIn()
+        if main_menu.update(key.pressed):
+            break
+        x +=1
+
+    tGame.end()
