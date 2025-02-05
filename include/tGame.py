@@ -203,7 +203,7 @@ class KeyboardInput:
             tty.setraw(fd)
 
         # Control codes for POSIX/WINDOWS
-        # UP DOWN RIGHT LEFT
+        # UP DOWN RIGHT LEFT ENTER
             CONTROL_CODES = (*range(65,69), 3)
         else:
             CONTROL_CODES = (72, 80, 77, 75, b'\x03')
@@ -256,8 +256,8 @@ class KeyboardInput:
             self.key_mash_counter = 0
 
         # Backspace
-        elif char == 8:
-# Test -             render("\033[3;5H Backspace")
+        elif char == 8 or (char == 127 and POSIX):
+            # render("\033[3;5H Backspace")
             self.pressed = KEY.BACKSPACE
             self.key_mash_counter = 0
         # Tab
@@ -271,7 +271,7 @@ class KeyboardInput:
             self.pressed = KEY.ENTER
             self.key_mash_counter = 0
         # CTRL-C
-        if char == 3:
+        elif char == 3:
             self.pressed = KEY.QUIT
             self.key_mash_counter = 0
 
@@ -308,17 +308,6 @@ class KeyboardInput:
 # Test -                 render("\033[2;5H CONTROL")
                 self.pressed = self._scan_in_control_codes(next_)
                 if self.pressed != 0: self.key_mash_counter = 0
-# Test -                 match self.pressed:
-# Test -                     case CONTROLS.UP: 
-# Test -                         render("^")
-# Test -                     case CONTROLS.DOWN: 
-# Test -                         render("v")
-# Test -                     case CONTROLS.RIGHT: 
-# Test -                         render(">")
-# Test -                     case CONTROLS.LEFT: 
-# Test -                         render("<")
-# Test -                     case _:
-# Test -                         render(str(char))
 
             elif char == 27: #ESC
 # Test -                 render("\033[3;5H ESCAPE")
