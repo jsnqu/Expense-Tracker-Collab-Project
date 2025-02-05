@@ -31,7 +31,6 @@ def init():
 
 def end():
     if POSIX:
-        import termios
         termios.tcsetattr(fd,termios.TCSADRAIN, old_settings)
 
 
@@ -205,7 +204,7 @@ class KeyboardInput:
 
         # Control codes for POSIX/WINDOWS
         # UP DOWN RIGHT LEFT
-            CONTROL_CODES = tuple(range(65,69), 3)
+            CONTROL_CODES = (*range(65,69), 3)
         else:
             CONTROL_CODES = (72, 80, 77, 75, b'\x03')
         self.CONTROL_MAP = dict(zip(
@@ -377,7 +376,8 @@ if __name__ == "__main__":
             elif keyboard.pressed == CONTROLS.ESCAPE:
                  screenClear()
             setCursor(1,1)
- 
+
+            render(keyboard.pressed)
             renderCopy()
 
     finally:

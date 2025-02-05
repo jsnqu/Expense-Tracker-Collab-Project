@@ -161,9 +161,7 @@ class ExpensesApp:
 
                 tGame.renderCopy()
 
-        tGame.setCursor(y=ORIGIN_POS[1]+6)
-        tGame.renderCopy()
-        date = self.input_date()
+        date = self.input_date(ORIGIN_POS[0], ORIGIN_POS[1]+6)
 
         expense = {
             "name": name,
@@ -172,14 +170,24 @@ class ExpensesApp:
         }
         self.expenses_list.append(expense)
 
-    @staticmethod
-    def input_date():
+    def input_date(self, x,y):
         today = time.strftime("%Y %m %d").split()
-        print("Leave blank for current date")
+        
+        tGame.setCursor(x,y)
+        tGame.render("Leave blank for current date\n")
 
         # Year
         while True:
-            year = input("  Year: ").strip()
+            tGame.setCursor(x,y+1)
+            tGame.render("Year:")
+            tGame.setCursor(x,y+2)
+            tGame.render("\033[2K")
+            tGame.renderCopy()
+            year = tGame.textInput(self.key_in, x,y+2)
+            
+            if year == CONTROLS.ESCAPE or year == KEY.QUIT:
+                return
+            year = year.strip()
             if year.isdigit():
                 year = int(year)
                 break
@@ -189,7 +197,16 @@ class ExpensesApp:
 
         # Month
         while True:
-            month = input("  Month: ").strip()
+            tGame.setCursor(x,y+3)
+            tGame.render("Month:")
+            tGame.setCursor(x,y+4)
+            tGame.render("\033[2K")
+            tGame.renderCopy()
+            month = tGame.textInput(self.key_in, x,y+4)
+
+            if month == CONTROLS.ESCAPE or month == KEY.QUIT:
+                return
+            month = month.strip()
             if (month.isdigit() and 1<=int(month)<=12):
                 # strips leading zero if inputted
                 month = str(int(month))
@@ -203,7 +220,17 @@ class ExpensesApp:
 
         # Day
         while True:
-            day = input("  Day: ").strip()
+            tGame.setCursor(x,y+5)
+            tGame.render("Day:")
+            tGame.setCursor(x,y+6)
+            tGame.render("\033[2K")
+            tGame.renderCopy()
+            day = tGame.textInput(self.key_in, x,y+6)
+
+            if day == CONTROLS.ESCAPE or day == KEY.QUIT:
+                return
+            
+            day = day.strip()
             if len(day) == 0:
                 day = today[2]
             if day.isdigit():
