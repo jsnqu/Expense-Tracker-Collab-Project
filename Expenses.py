@@ -138,12 +138,14 @@ class ExpensesApp:
         y_pos +=1
         tGame.setCursor(ORIGIN_POS[0], y_pos)
         tGame.renderCopy()
-
-        name = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
-
-        if name == CONTROLS.ESCAPE or name == KEY.QUIT:
-            return
-
+        while True:
+            name = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
+            if name == CONTROLS.ESCAPE or name == KEY.QUIT:
+                return
+            if len(name.strip())>0:
+                name = name.strip()
+                break
+        
         y_pos +=1
         tGame.setCursor(ORIGIN_POS[0], y_pos)
         tGame.render("Category?")
@@ -151,11 +153,15 @@ class ExpensesApp:
         y_pos+=1
         tGame.setCursor(ORIGIN_POS[0], y_pos)
         tGame.renderCopy()
+        while True:
+            category = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
+            if category == CONTROLS.ESCAPE or category == KEY.QUIT:
+                return
+            if len(category.strip())>0:
+                category = category.strip()
+                break
 
-        category = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
 
-        if category == CONTROLS.ESCAPE or category == KEY.QUIT:
-            return
         category = category.title().strip()
 
         y_pos += 1
@@ -350,8 +356,6 @@ class ExpensesApp:
                              "Invalid Option" + Colour.RESET)
                 tGame.renderCopy()
 
-    def filter_expenses(self):
-        pass
     def calculate_expenses(self):
         pass
 
