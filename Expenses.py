@@ -43,10 +43,11 @@ class ExpensesApp:
         category = input().title().strip()
         while True:
             amount = input("How much is your expense? ").title().strip()
-            if amount.isdigit():
-                amount = int(amount)
+            try:
+                amount = float(amount)
+                amount = round(amount, 2)
                 break
-            else:
+            except ValueError:
                 print("Invalid Amount")
         expense = {
             "name": name,
