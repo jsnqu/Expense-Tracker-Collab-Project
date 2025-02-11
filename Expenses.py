@@ -285,12 +285,16 @@ class ExpensesApp:
         tGame.setCursor(*ORIGIN_POS)
         tGame.showCursor()
 
+        # Setup for UI
         tGame.render(Colour.FOREGROUND["RED"]+"Which one would you like to remove?"+Colour.RESET)
 
+        # Control Hint
         tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
         tGame.render(HINT_COLOUR+"(ESCAPE) for options" + Colour.RESET)
 
+        # Move to where view expenses is TODO: make view_expenses separate screen
         tGame.setCursor(ORIGIN_POS[0], 7)
+
         tGame.renderCopy()
 
         self.view_expenses()
