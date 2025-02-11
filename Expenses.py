@@ -173,15 +173,15 @@ class ExpensesApp:
                 return
 
             amount = amount.strip(" $")
-            if amount.isdigit():
-                amount = int(amount)
+            try:
+                amount = float(amount)
+                amount = round(amount, 2)
                 break
-            else:
+            except ValueError:
                 tGame.moveCursor('B', 1)
                 tGame.setCursor(ORIGIN_POS[0])
                 tGame.render(INVALID_COLOUR+"Invalid Amount"+ Colour.RESET)
 
-                
                 # Reset to original position
                 tGame.setCursor(ORIGIN_POS[0])
                 tGame.moveCursor('A', 1)
