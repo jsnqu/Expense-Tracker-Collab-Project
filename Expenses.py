@@ -286,8 +286,8 @@ class ExpensesApp:
         tGame.showCursor()
 
         # Setup for UI
-        tGame.render(Colour.FOREGROUND["RED"]+"Which one would you like to remove?"+Colour.RESET)
-
+        tGame.render(Colour.FOREGROUND["RED"]+"Which one would you like to remove?"+Colour.RESET)         
+        
         # Control Hint
         tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
         tGame.render(HINT_COLOUR+"(ESCAPE) for options" + Colour.RESET)
@@ -299,7 +299,15 @@ class ExpensesApp:
 
         self.view_expenses()
 
-        while True:
+        while True:          
+            tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
+            tGame.render("Category:")
+            tGame.renderCopy()
+            category_choice = tGame.textInput(self.key_in,
+                                     ORIGIN_POS[0]+10, ORIGIN_POS[1]+1)
+            if category_choice not in self.expenses_list:
+                continue
+            
             tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
             tGame.render("\033[2K")
             tGame.renderCopy()
