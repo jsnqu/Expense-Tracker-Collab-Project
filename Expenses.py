@@ -139,21 +139,48 @@ class ExpensesApp:
         tGame.setCursor(ORIGIN_POS[0], y_pos)
         tGame.renderCopy()
 
-        name = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
+        while True:
+            name = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
+            if len(name.strip()) == 0:
+                tGame.moveCursor('B', 1)
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.render(INVALID_COLOUR+"Invalid Input"+ Colour.RESET)
+                # Reset to original position
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.moveCursor('A', 1)
+                tGame.render("\033[2K")
+                # Redraw Help which gets partially cleared by prev. line
+                ExpensesApp.help_display(40,2, "New Expense")
+                tGame.renderCopy()
+            else:
+                break
 
         if name == CONTROLS.ESCAPE or name == KEY.QUIT:
             return
 
         y_pos +=1
         tGame.setCursor(ORIGIN_POS[0], y_pos)
-        tGame.render("Category?")
+        tGame.render("Category?           ")
 
         y_pos+=1
         tGame.setCursor(ORIGIN_POS[0], y_pos)
         tGame.renderCopy()
-
-        category = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
-
+        while True:
+            category = tGame.textInput(self.key_in, ORIGIN_POS[0], y_pos)
+            if len(category.strip()) == 0:
+                tGame.moveCursor('B', 1)
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.render(INVALID_COLOUR+"Invalid Input"+ Colour.RESET)
+                # Reset to original position
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.moveCursor('A', 1)
+                tGame.render("\033[2K")
+                # Redraw Help which gets partially cleared by prev. line
+                ExpensesApp.help_display(40,2, "New Expense")
+                tGame.renderCopy()
+            else:
+                break
+        
         if category == CONTROLS.ESCAPE or category == KEY.QUIT:
             return
         category = category.title().strip()
