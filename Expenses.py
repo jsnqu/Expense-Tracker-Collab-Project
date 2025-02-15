@@ -92,7 +92,7 @@ class ExpensesApp:
                     self.view_expenses() # Not new scene (yet?) TODO
                     self.key_in.keyNext() # Waits for any input before screenClear() is called
                 case 3:
-                    self.calculate_expenses() #shows expense total
+                    self.expense_summary() #shows expense total
                 case 4:
                     return # Quit app
             time.sleep(0.1)
@@ -110,10 +110,13 @@ class ExpensesApp:
                 tGame.render("Category: "+category+'\n'+'-'*30+'\n')
 
                 for expense in expenses:
+                    # Expense name
                     tGame.setCursor(ORIGIN_POS[0]+2)
                     tGame.render(f"{reminder_number}. {expense['name']}\n")
+                    # Cost
                     tGame.setCursor(ORIGIN_POS[0]+4)
                     tGame.render(f"{MONEY_COLOUR}Amount:{Colour.RESET} ${expense['amt']}\n")
+                    # Date of expense
                     tGame.setCursor(ORIGIN_POS[0]+4)
                     tGame.render(f"{DATE_COLOUR}Date:{Colour.RESET} {MONTH_NAMES[expense['date'][1]-1].title()} {expense['date'][2]}, {expense['date'][0]}\n\n")
                     reminder_number+=1
@@ -125,6 +128,36 @@ class ExpensesApp:
         self.key_in.keyIn()
         tGame.render("\033[2K")
         tGame.renderCopy()
+
+    def expense_summary(self):
+        tGame.screenClear()
+        tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1])
+
+        if len(self.expenses_list) == 0: 
+            tGame.render("You currently have no expenses to calculate.")
+        else:
+            total_expenses = 0
+            for category, expenses in self.expenses_list.items():
+                category_total = 0
+                category_total = float(category_total)
+
+                for expense in expenses:
+                    category_total += expense['amt']
+
+                total_expenses += category_total
+
+                tGame.setCursor(ORIGIN_POS[0])
+                tGame.render(f"{category}: ${category_total}\n")
+
+            tGame.render('\n')
+            tGame.setCursor(ORIGIN_POS[0])
+            tGame.render(f"Total: ${total_expenses}")
+
+        tGame.render('\n\n')
+        tGame.setCursor(ORIGIN_POS[0])
+        tGame.render(HINT_COLOUR+"(ANY KEY) to continue"+Colour.RESET)
+        tGame.renderCopy()
+        self.key_in.keyIn()
 
     def add_expense(self):
         tGame.screenClear()
@@ -402,37 +435,6 @@ class ExpensesApp:
                                  "Invalid Option" + Colour.RESET)
                     tGame.renderCopy()
 
-    def calculate_expenses(self):
-        tGame.setCursor(ORIGIN_POS[0])
-        if len(self.expenses_list) == 0: 
-            tGame.render("You currently have no expenses to calculate.")
-        else:
-            for category, expenses in self.expenses_list.items():
-                reminder_number = 1
-                tGame.setCursor(ORIGIN_POS[0])
-                tGame.render("Category "+category+'\n'+'-'*30+'\n')
-                category_total = 0
-                category_total = float(category_total)
-                for expense in expenses:
-                    tGame.setCursor(ORIGIN_POS[0]+4)
-                    tGame.render(f"{DATE_COLOUR}Date:{Colour.RESET} {MONTH_NAMES[expense['date'][1]-1].title()} {expense['date'][2]}, {expense['date'][0]}\n\n")
-                    tGame.setCursor(ORIGIN_POS[0]+2)
-                    tGame.render(f"{reminder_number}. {expense['name']}\n")
-                    tGame.setCursor(ORIGIN_POS[0]+4)
-                    tGame.render(f"{MONEY_COLOUR}Amount:{Colour.RESET} ${expense['amt']}\n")
-                    reminder_number += 1
-                    category_total += expense['amt']
-                tGame.setCursor(ORIGIN_POS[0])
-                tGame.render(f"Category Total: ${category_total}")
-
-        tGame.render('\n')
-        tGame.setCursor(ORIGIN_POS[0])
-        tGame.render(HINT_COLOUR+"(ANY KEY) to continue"+Colour.RESET)
-        tGame.renderCopy()
-        self.key_in.keyIn()
-        tGame.render("\033[2K")
-        tGame.renderCopy()
-
 
     @staticmethod
     def help_display(x,y, option):
@@ -458,23 +460,3 @@ if __name__ =="__main__":
     finally:
         tGame.end()
 
-#                # Clears options message
-#                tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+3)
-#                tGame.render("\033[2K")
-#
-#                self.remove_menu.draw()
-#                tGame.renderCopy()
-#                while self.key_in.keyIn():
-#                    action = self.remove_menu.update(self.key_in.pressed)
-#                    tGame.renderCopy()
-#                    if action:
-#                        match action[0]:
-#                            # Back to Input
-#                            case 0: break
-#                            # View
-#                            case 1:
-#                                tGame.setCursor(ORIGIN_POS[0], 7)
-#                                tGame.renderCopy()
-#                                self.view_expenses()
-#                            # Exit
-# 
