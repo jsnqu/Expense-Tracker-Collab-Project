@@ -382,7 +382,7 @@ class ExpensesApp:
                     choice = int(choice)
                     self.expenses_list[category_choice].pop(choice-1)
                     if len(self.expenses_list[category_choice]) == 0:
-                        del self.expenses_list[category_choic]
+                        del self.expenses_list[category_choice]
     
                     # Remaining expenses
                     tGame.screenClear()
