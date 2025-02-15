@@ -132,6 +132,7 @@ class ExpensesApp:
     def expense_summary(self):
         tGame.screenClear()
         tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1])
+        tGame.render("Expense Summary\n"+'-'*30+'\n')
 
         if len(self.expenses_list) == 0: 
             tGame.render("You currently have no expenses to calculate.")
