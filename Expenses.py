@@ -382,7 +382,7 @@ class ExpensesApp:
                     choice = int(choice)
                     self.expenses_list[category_choice].pop(choice-1)
                     if len(self.expenses_list[category_choice]) == 0:
-                        del self.expenses_list[category_choic]
+                        del self.expenses_list[category_choice]
     
                     # Remaining expenses
                     tGame.screenClear()
@@ -400,8 +400,6 @@ class ExpensesApp:
                                  "Invalid Option" + Colour.RESET)
                     tGame.renderCopy()
 
-    def filter_expenses(self):
-        pass
     def calculate_expenses(self):
         pass
 
