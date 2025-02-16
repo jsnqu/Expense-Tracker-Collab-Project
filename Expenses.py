@@ -31,6 +31,7 @@ class ExpensesApp:
                               text_colour=(100, 20, 7))
 
         self.expenses_list = dict()
+        self.load_data()
 
     def __del__(self):
         tGame.end()
@@ -92,6 +93,7 @@ class ExpensesApp:
                 case 3:
                     self.expense_summary() #shows expense total
                 case 4:
+                    self.save_data()
                     return # Quit app
             time.sleep(0.1)
             tGame.screenClear()
@@ -428,6 +430,24 @@ class ExpensesApp:
                                  "Invalid Option" + Colour.RESET)
                     tGame.renderCopy()
 
+    def load_data(self):
+        try:
+            with open ("data.json", 'r') as f:
+                self.expenses_list = json.loads(f.read())
+        except FileNotFoundError:
+            tGame.render("No save file found.\nCreating blank file...")
+            tGame.renderCopy()
+
+            self.expenses_list = {}
+            self.save_data()
+
+    def save_data(self):
+        tGame.render("\nSaving...\n")
+        tGame.renderCopy()
+        with open ("data.json", 'w') as f:
+            f.write(json.dumps(self.expenses_list))
+        time.sleep(0.1)
+        tGame.render("Done!\n")
 
     @staticmethod
     def help_display(x,y, option):
