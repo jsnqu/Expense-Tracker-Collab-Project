@@ -148,7 +148,7 @@ class ExpensesApp:
                 total_expenses += category_total
 
                 tGame.setCursor(ORIGIN_POS[0])
-                tGame.render(f"{category}: ${category_total}\n")
+                tGame.render(f"Category - {category}: ${category_total}\n")
 
             tGame.render('\n')
             tGame.setCursor(ORIGIN_POS[0])
