@@ -1,4 +1,4 @@
-
+import json
 import os,sys
 import time
 sys.path.append(os.path.join(os.path.dirname(__file__), "./include"))
@@ -447,6 +447,13 @@ class ExpensesApp:
 
 if __name__ =="__main__":
     tGame.init()
+    tGame.screenClear()
+    tGame.setCursor(1,1)
+    tGame.renderCopy()
+
+    print("For best experience, please set terminal size to at least 70x35. Type 'y' to continue")
+    while input("> ") != 'y':
+        pass
     try:
         app = ExpensesApp()
         app.run()
