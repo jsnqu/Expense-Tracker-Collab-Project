@@ -19,7 +19,7 @@ class ExpensesApp:
         self.key_in = tGame.KeyboardInput()
 
         self.main_menu = Keypad(
-                ["Add Expense", "Remove Expense", "View Expense", "Total Expense", "Exit"])
+                ["Add Expense", "Remove Expense", "View Expenses", "Total Expense", "Exit"])
         self.main_menu.format(x=ORIGIN_POS[0],y=ORIGIN_POS[1]+5,
                               layout=Keypad.LAYOUT.VERTICAL,
                               text_colour=(100,100,150))
@@ -86,11 +86,9 @@ class ExpensesApp:
                     self.remove_menu.index = 0 # Sets to first option in menu
                     self.remove_expense() # New scene
                 case 2:
-                    tGame.setCursor(ORIGIN_POS[0],12)
+                    tGame.setCursor(ORIGIN_POS[0],12) # Displays expenses below main menu
                     tGame.renderCopy()
-
-                    self.view_expenses() # Not new scene (yet?) TODO
-                    self.key_in.keyNext() # Waits for any input before screenClear() is called
+                    self.view_expenses()
                 case 3:
                     self.expense_summary() #shows expense total
                 case 4:
@@ -362,14 +360,10 @@ class ExpensesApp:
         tGame.render(Colour.FOREGROUND["RED"]+"Which one would you like to remove?"+Colour.RESET)         
         
         # Control Hint
-        tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
-        self.help_display(ORIGIN_POS[0]+40, ORIGIN_POS[1]+7, "Input")
+        self.help_display(ORIGIN_POS[0]+35, ORIGIN_POS[1]+5, "Input")
 
-        # Move to where view expenses is TODO: make view_expenses separate screen
+        # Move to where view expenses is
         tGame.setCursor(ORIGIN_POS[0], 7)
-
-        tGame.renderCopy()
-
         self.view_expenses()
 
         while True:          
@@ -393,21 +387,19 @@ class ExpensesApp:
                 tGame.renderCopy()
                 continue
             
-            # Clear "Invalid Option" tag if exists
-            tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+2)
-            tGame.render("\033[2K")
 
             # Expense choice
             while True:
-                # Clear input line
-                tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
+                # Clear "Invalid Option" tag if exists
+                tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+2)
                 tGame.render("\033[2K")
+
                 tGame.render("Expense #:")
                 tGame.renderCopy()
     
                 # Expense number
                 choice = tGame.textInput(self.key_in,
-                                         ORIGIN_POS[0]+11, ORIGIN_POS[1]+1)
+                                         ORIGIN_POS[0]+11, ORIGIN_POS[1]+2)
     
                 if choice == CONTROLS.ESCAPE or choice == KEY.QUIT:
                     return
@@ -431,7 +423,7 @@ class ExpensesApp:
     
                 # Invalid
                 else:
-                    tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+2)
+                    tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+3)
                     tGame.render(INVALID_COLOUR+
                                  "Invalid Option" + Colour.RESET)
                     tGame.renderCopy()
