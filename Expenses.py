@@ -446,8 +446,9 @@ class ExpensesApp:
         tGame.renderCopy()
         with open ("data.json", 'w') as f:
             f.write(json.dumps(self.expenses_list))
-        time.sleep(0.1)
+        time.sleep(0.4)
         tGame.render("Done!\n")
+        tGame.renderCopy()
 
     @staticmethod
     def help_display(x,y, option):
