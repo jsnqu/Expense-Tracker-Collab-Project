@@ -7,7 +7,7 @@ from Menu import Keypad
 
 MONTH_NAMES = ('january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december')
 
-HINT_COLOUR = Colour.getCodeRGB((100, 20, 7), Colour.COLOUR_OPTION.FOREGROUND)
+HINT_COLOUR = Colour.getCodeRGB((170, 105, 87), Colour.COLOUR_OPTION.FOREGROUND)
 INVALID_COLOUR = Colour.getCodeBasic("RED", Colour.COLOUR_OPTION.AUTO_BACK)
 MONEY_COLOUR = Colour.getCodeRGB((210,255,205), Colour.COLOUR_OPTION.AUTO_BACK)
 DATE_COLOUR = Colour.getCodeRGB((210,205,255), Colour.COLOUR_OPTION.AUTO_BACK)
@@ -100,7 +100,9 @@ class ExpensesApp:
             tGame.setCursor(1,1)
 
     def view_expenses(self):
-        tGame.setCursor(ORIGIN_POS[0])
+        tGame.screenClear()
+        tGame.setCursor(*ORIGIN_POS)
+
         if len(self.expenses_list) == 0: 
             tGame.render("You currently have no expenses.")
         else:
@@ -354,6 +356,10 @@ class ExpensesApp:
         return [year, int(month), day]      
 
     def remove_expense(self):
+        # view expenses first
+        self.view_expenses()
+
+        # Clear screen and start remove_expense
         tGame.screenClear()
         tGame.setCursor(*ORIGIN_POS)
         tGame.showCursor()
@@ -364,15 +370,25 @@ class ExpensesApp:
         # Control Hint
         self.help_display(ORIGIN_POS[0]+35, ORIGIN_POS[1]+5, "Input")
 
-        # Move to where view expenses is
-        tGame.setCursor(ORIGIN_POS[0], 7)
-        self.view_expenses()
+        tGame.renderCopy()
 
         while True:          
+            # Display categories
+            tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+4)
+            tGame.render("Categories:\n")
+            for category in self.expenses_list:
+                tGame.setCursor(ORIGIN_POS[0]+2)
+                # Constrains to 30 chars to prevent overflow into control display
+                tGame.render(category[0:min(len(category), 30)] +
+                             ("..." if len(category) >= 30 else "") +'\n')
+            tGame.renderCopy()
+
             # Category Input
             tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+1)
             tGame.render("\033[2K")
             tGame.render("Category:")
+
+            
             tGame.renderCopy()
             category_choice = tGame.textInput(self.key_in,
                                      ORIGIN_POS[0]+10, ORIGIN_POS[1]+1)
@@ -389,6 +405,27 @@ class ExpensesApp:
                 tGame.renderCopy()
                 continue
             
+            # Clear categories
+            tGame.setCursor(ORIGIN_POS[0],ORIGIN_POS[1]+4)
+            tGame.render("Expenses:  \n")
+            for category in self.expenses_list:
+                # End of string
+                tGame.setCursor(ORIGIN_POS[0]+4+30)
+                # Clear to beginning of line
+                tGame.render("\033[1K\n")
+
+            # Display expenses
+            tGame.setCursor(1,ORIGIN_POS[1]+5)
+            expense_num = 1
+            for expense in self.expenses_list[category_choice]:
+                expense = expense["name"]
+
+                tGame.render(f"{expense_num}. ")
+                # Constrains to 30 chars to prevent overflow into control display
+                tGame.render(expense[0:min(len(expense), 30)] +
+                             ("..." if len(expense) >= 30 else "") +'\n')
+                expense_num += 1
+            tGame.renderCopy()
 
             # Expense choice
             while True:
@@ -414,11 +451,12 @@ class ExpensesApp:
                     if len(self.expenses_list[category_choice]) == 0:
                         del self.expenses_list[category_choice]
     
-                    # Remaining expenses
+                    # Show remaining expenses
                     tGame.screenClear()
                     tGame.setCursor(*ORIGIN_POS)
                     tGame.render("Your remaining expenses are:")
-                    tGame.setCursor(ORIGIN_POS[0], ORIGIN_POS[1]+2)
+                    tGame.renderCopy()
+                    time.sleep(0.7)
                     self.view_expenses()
 
                     return
